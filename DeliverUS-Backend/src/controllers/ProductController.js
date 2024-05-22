@@ -56,6 +56,17 @@ const update = async function (req, res) {
   }
 }
 
+const discount = async function (req, res) {
+  try {
+    const prod = await Product.findOne({where: {id: req.params.productId}})
+    await Product.update({discounted: !prod.dataValues.discounted}, { where: { id: req.params.productId } })
+    const updatedProduct = await Product.findByPk(req.params.productId)
+    res.json(updatedProduct)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
 const destroy = async function (req, res) {
   try {
     const result = await Product.destroy({ where: { id: req.params.productId } })
@@ -113,6 +124,7 @@ const ProductController = {
   create,
   update,
   destroy,
-  popular
+  popular,
+  discount
 }
 export default ProductController

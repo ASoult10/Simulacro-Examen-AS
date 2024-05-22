@@ -4,7 +4,7 @@ import { StyleSheet, View, FlatList, ImageBackground, Image, Pressable } from 'r
 import { showMessage } from 'react-native-flash-message'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { getDetail } from '../../api/RestaurantEndpoints'
-import { remove } from '../../api/ProductEndpoints'
+import { remove, discount } from '../../api/ProductEndpoints'
 import ImageCard from '../../components/ImageCard'
 import TextRegular from '../../components/TextRegular'
 import TextSemiBold from '../../components/TextSemibold'
@@ -54,18 +54,61 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
     )
   }
 
+  const discountProduct = async (product) => {
+    try {
+      await discount(product.id)
+      await fetchRestaurantDetail()
+      showMessage({
+        message: `Product ${product.name} succesfully discounted`,
+        type: 'success',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    } catch (error) {
+      console.log(error)
+      showMessage({
+        message: `Product ${product.name} could not be discounted.`,
+        type: 'error',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle})
+    }
+  }
+
   const renderProduct = ({ item }) => {
     return (
       <ImageCard
         imageUri={item.image ? { uri: process.env.API_BASE_URL + '/' + item.image } : defaultProductImage}
-        title={item.name}
+        title={item.name + (item.discounted?' (' + restaurant.discount + '% off)':'')}
       >
         <TextRegular numberOfLines={2}>{item.description}</TextRegular>
         <TextSemiBold textStyle={styles.price}>{item.price.toFixed(2)}€</TextSemiBold>
+        {item.discounted &&
+          <TextRegular textStyle={[styles.price, {color: GlobalStyles.brandSuccess}]}>
+            Price promoted: {(item.price * (1-(restaurant.discount/100))).toFixed(2)}€
+          </TextRegular>
+        }
         {!item.availability &&
           <TextRegular textStyle={styles.availability }>Not available</TextRegular>
         }
          <View style={styles.actionButtonsContainer}>
+          <Pressable
+              onPress={() => discountProduct(item)
+              }
+              style={({ pressed }) => [
+                {
+                  backgroundColor: pressed
+                    ? GlobalStyles.brandSuccess
+                    : GlobalStyles.brandSuccessTap
+                },
+                styles.actionButton
+              ]}>
+            <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+              <MaterialCommunityIcons name='star' color={'white'} size={20}/>
+              <TextRegular textStyle={styles.text}>
+                {item.discounted?'Depromote':'Promote'}
+              </TextRegular>
+            </View>
+          </Pressable>
           <Pressable
             onPress={() => navigation.navigate('EditProductScreen', { id: item.id })
             }
@@ -237,7 +280,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf: 'center',
     flexDirection: 'column',
-    width: '50%'
+    width: '20%'
   },
   actionButtonsContainer: {
     flexDirection: 'row',

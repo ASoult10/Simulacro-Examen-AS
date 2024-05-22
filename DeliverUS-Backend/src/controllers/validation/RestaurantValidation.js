@@ -41,7 +41,7 @@ const create = [
   }).withMessage('Maximum file size of ' + maxFileSize / 1000000 + 'MB'),
   //check('promoted').isBoolean(),
   check('promoted').custom(checkOnlyPromoted),
-  check('discount').optional({ nullable: true}).isInt({min: 0, max: 99})
+  check('discount').exists().isInt({min: 0, max: 100}).withMessage('Incorrect discount percentage')
 ]
 const update = [
   check('name').exists().isString().isLength({ min: 1, max: 255 }).trim(),
@@ -67,7 +67,7 @@ const update = [
     return checkFileMaxSize(req, 'logo', maxFileSize)
   }).withMessage('Maximum file size of ' + maxFileSize / 1000000 + 'MB'),
   //check('promoted').isBoolean()
-  check('discount').optional({ nullable: true}).isInt({min: 0, max: 99})
+  check('discount').exists().isInt({min: 0, max: 100}).withMessage('Incorrect discount percentage')
 ]
 
 export { create, update }

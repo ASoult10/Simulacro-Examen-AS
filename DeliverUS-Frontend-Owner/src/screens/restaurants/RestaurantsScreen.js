@@ -66,6 +66,8 @@ export default function RestaurantsScreen ({ navigation, route }) {
         <TextSemiBold>Shipping: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.shippingCosts.toFixed(2)}€</TextSemiBold></TextSemiBold>
         {item.promoted &&
           <TextSemiBold>¡En promocion!</TextSemiBold>}
+        {item.discount > 0 &&
+          <TextSemiBold>Con descuento: {item.discount}</TextSemiBold>}
         <View style={styles.actionButtonsContainer}>
           <Pressable
             onPress={() => navigation.navigate('EditRestaurantScreen', { id: item.id })
