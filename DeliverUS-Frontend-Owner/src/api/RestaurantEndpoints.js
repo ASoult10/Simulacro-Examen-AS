@@ -27,4 +27,8 @@ function promote (id) {
   return patch(`restaurants/${id}/promote`)
 }
 
-export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote }
+function changeStatus (id) {
+  return patch(`restaurants/${id}/status`)
+}
+
+export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, changeStatus }

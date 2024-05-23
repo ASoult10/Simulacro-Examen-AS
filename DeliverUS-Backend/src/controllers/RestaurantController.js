@@ -99,6 +99,26 @@ const promote = async function (req, res) {
   }
 }
 
+const changeStatus = async function (req, res) {
+  const t = await Restaurant.sequelize.transaction()
+  try {
+    const promRes = await Restaurant.findOne({ where: { id: req.params.restaurantId } })
+    console.log(promRes)
+    let updatedRestaurant
+    if(promRes.status === 'online'){
+      updatedRestaurant = await Restaurant.update({status: 'offline'}, { where: { id: promRes.id }, transaction: t })
+    } else {
+      updatedRestaurant = await Restaurant.update({status: 'online'}, { where: { id: promRes.id }, transaction: t })
+    }
+    console.log(updatedRestaurant)
+    await t.commit()
+    res.json(updatedRestaurant)
+  } catch (err) {
+    await t.rollback()
+    res.status(500).send(err)
+  }
+}
+
 const destroy = async function (req, res) {
   try {
     const result = await Restaurant.destroy({ where: { id: req.params.restaurantId } })
@@ -121,6 +141,7 @@ const RestaurantController = {
   show,
   update,
   destroy,
-  promote
+  promote,
+  changeStatus
 }
 export default RestaurantController

@@ -24,5 +24,31 @@ const restaurantHasNoOrders = async (req, res, next) => {
     return res.status(500).send(err.message)
   }
 }
+const checkRestaurantOpen = async (req, res, next) => {
+  try {
+    const restaurant = await Restaurant.findOne({
+      where: { id: req.params.restaurantId }
+    })
+    if (restaurant.status === 'closed' || restaurant.status === 'temporarily closed') {
+      return res.status(409).send('This restaurant is closed.')
+    }
+    return next()
+  } catch (err) {
+    return res.status(500).send(err.message)
+  }
+}
+const checkOrdersNotDelivered = async (req, res, next) => {
+  try {
+    const numberOfNullRestaurantOrders = await Order.findAll({
+      where: { restaurantId: req.params.restaurantId, deliveredAt: null }
+    })
+    if (numberOfNullRestaurantOrders.length === 0) {
+      return next()
+    }
+    return res.status(409).send('Some orders have not been delivered yet.')
+  } catch (err) {
+    return res.status(500).send(err.message)
+  }
+}
 
-export { checkRestaurantOwnership, restaurantHasNoOrders }
+export { checkRestaurantOwnership, restaurantHasNoOrders, checkRestaurantOpen, checkOrdersNotDelivered }

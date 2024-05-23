@@ -64,12 +64,22 @@ const loadFileRoutes = function (app) {
       OrderController.analytics)
   
   app.route('/restaurants/:restaurantId/promote')
-      .patch(
-        isLoggedIn,
-        hasRole('owner'),
-        checkEntityExists(Restaurant, 'restaurantId'),
-        RestaurantMiddleware.checkRestaurantOwnership,
-        RestaurantController.promote
-      )
+    .patch(
+      isLoggedIn,
+      hasRole('owner'),
+      checkEntityExists(Restaurant, 'restaurantId'),
+      RestaurantMiddleware.checkRestaurantOwnership,
+      RestaurantController.promote
+    )
+  app.route('/restaurants/:restaurantId/status')
+    .patch(
+      isLoggedIn,
+      hasRole('owner'),
+      checkEntityExists(Restaurant, 'restaurantId'),
+      RestaurantMiddleware.checkRestaurantOwnership,
+      RestaurantMiddleware.checkRestaurantOpen,
+      RestaurantMiddleware.checkOrdersNotDelivered,
+      RestaurantController.changeStatus
+    )
 }
 export default loadFileRoutes
