@@ -31,4 +31,8 @@ function changeStatus (id) {
   return patch(`restaurants/${id}/status`)
 }
 
-export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, changeStatus }
+function createRestaurantCategory (data) {
+  return post('restaurantCategories', data)
+}
+
+export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, changeStatus, createRestaurantCategory }
